@@ -8,6 +8,7 @@ import CardsList from './CardsList';
 import Form from './Form';
 
 import data from '../data';
+import Button from './Button';
 
 class Board extends Component {
   constructor(props) {
@@ -30,7 +31,13 @@ class Board extends Component {
   // TODO: implement the componentDidMount lifecycle method to fetch data and init the component state.
   // Tips:
   // - Use the `this.setState` method to update the component state
-  componentDidMount() {}
+  componentDidMount() {
+    this.setState({
+      lists: data.lists,
+      cards: data.cards,
+      listOrder: data.listOrder,
+    });
+  }
 
   // TODO: implement the handleAddList method to add a new list to the board.
   // Tips:
@@ -39,7 +46,9 @@ class Board extends Component {
   // - Add the new list
   // - Use the `this.setState` method to update the state (lists, listOrder, newListText, creatingNewList)
   // - Reset the `newListText` and `creatingNewList` state values as well to cleanup and close the form
-  handleAddList(title = '') {}
+  handleAddList = (title = '') => {
+    console.log('handle add list board js', title);
+  };
 
   // TODO: implement the handleRemoveList method to remove a list from the board.
   // Tips:
@@ -144,18 +153,36 @@ class Board extends Component {
   // - Add the children function that returns your board lists component and bind everything together
   // --> https://github.com/atlassian/react-beautiful-dnd/blob/master/docs/api/droppable.md#children-function
   renderLists() {
-    return (
-      <div className="board-lists">
-        { /* render the lists */ }
-      </div>
-    );
+    const renerLists = this.state.listOrder.map((list) => (
+      <CardsList cards={this.state.cards} />
+    ));
+    return <div className="board-lists">{renerLists}</div>;
   }
 
   // TODO: implement the renderNewList method to render the list creation form.
   // Tips:
   // - Render a Form component in creation mode to let the user enter the new list title
   // - Otherwise, render a button to trigger the creation mode (creatingNewList)
-  renderNewList() {}
+  renderNewList() {
+    return !this.state.creatingNewList ? (
+      <Button
+        text="Add a new List"
+        variant="editor"
+        onClick={() => this.setState({ creatingNewList: true })}
+      />
+    ) : (
+      <Form
+        placeholder="Edit a title for this list"
+        type="list"
+        onClickSubmit={this.handleAddList}
+        onClickCancel={() =>
+          this.setState({
+            creatingNewList: false,
+          })
+        }
+      />
+    );
+  }
 
   // TODO: render the Board UI.
   //
@@ -166,11 +193,13 @@ class Board extends Component {
   render() {
     return (
       <div className="board">
-        { /* render the lists */ }
-        { /* render the list creation form */ }
+        {/* render the lists */}
+        {/* render the list creation form */}
+        {this.renderLists()}
+        {this.renderNewList()}
       </div>
     );
   }
-};
+}
 
 export default Board;
