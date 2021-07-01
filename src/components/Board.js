@@ -253,6 +253,7 @@ class Board extends Component {
         {/* render the list creation form */}
         {this.renderLists()}
         {this.renderNewList()}
+        <div>test git</div>
       </div>
     );
   }
