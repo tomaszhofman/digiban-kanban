@@ -59,7 +59,8 @@ class Form extends Component {
   // - Call the `this.props.onClickSubmit` method to submit the text
   // - Clean up the control form value using `this.setState`
   handleOnSubmit = (event) => {
-    this.props.onClickSubmit(this.state.text);
+    // this.props.onClickSubmit(this.state.text);
+    this.props.handleAddNewCard(this.state.text);
     this.setState({ text: '' });
   };
 
@@ -79,25 +80,37 @@ class Form extends Component {
     return (
       <form ref={this.formRef} className={`form form-${this.props.type}`}>
         {/* render form control: input or textarea */}
-        <input
-          className="form-input"
-          ref={this.controlRef}
-          onChange={this.handleOnChangeText}
-          onKeyDown={this.handleOnKeyDown}
-          type="text"
-          value={this.state.text}
-          placeholder={this.props.placeholder}
-        />
-        <div className="form-actions">
-          <Button variant="success" text="Add List" icon={CancelIcon} />
 
-          {/* <button className="btn btn-success">
-            <span>Add list</span>
-          </button> */}
-          <span className="form-cancel-action">
-            <CancelIcon onClick={this.props.onClickCancel} />
-          </span>
-        </div>
+        {this.props.type === 'editor' ? (
+          <textarea
+            className="form-textarea"
+            placeholder={this.props.placeholder}
+            value={this.state.text}
+            ref={this.controlRef}
+            onChange={this.handleOnChangeText}
+            onKeyDown={this.handleOnKeyDown}
+          />
+        ) : (
+          <>
+            <input
+              className="form-input"
+              ref={this.controlRef}
+              onChange={this.handleOnChangeText}
+              onKeyDown={this.handleOnKeyDown}
+              type="text"
+              value={this.state.text}
+              placeholder={this.props.placeholder}
+            />
+
+            <div className="form-actions">
+              <Button variant="success" text="Add List" icon={CancelIcon} />
+
+              <span className="form-cancel-action">
+                <CancelIcon onClick={this.props.onClickCancel} />
+              </span>
+            </div>
+          </>
+        )}
       </form>
     );
   }

@@ -10,6 +10,7 @@ const Button = (props) => {
         className={
           props.variant === 'success' ? 'btn btn-success' : 'add-button'
         }
+        {...props}
       >
         {props.variant === 'success' ? null : <IconPlus />}
         <span>{props.text}</span>

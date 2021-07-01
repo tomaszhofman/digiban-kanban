@@ -22,6 +22,7 @@ class Board extends Component {
       newListText: '',
       creatingNewList: false,
       openMenuId: null,
+      isMenuOpen: false,
     };
 
     // TODO: Bind your class methods here
@@ -64,7 +65,36 @@ class Board extends Component {
   // - Use the `_getNextNumber` function to get the new card number
   // - Add the new card
   // - Use the `this.setState` method to update the state (lists, cards)
-  handleAddCard(listId, description = '') {}
+  handleAddCard = (listId, description = '') => {
+    if (description === '') return;
+    const id = _generateId();
+    const cardNumber = _getNextNumber();
+    console.log(id, cardNumber);
+    const newCard = {
+      id: id,
+      number: cardNumber,
+      description: description,
+    };
+
+    // const newCardInList = {
+
+    // }
+    this.setState({ cards: { ...this.state.cards, [id]: newCard } });
+    // this.setState({ lists: { ...this.state.lists, [listId]: 'test' } });
+
+    this.setState({
+      lists: {
+        ...this.state.lists,
+        [listId]: {
+          title: this.state.lists[listId].title,
+          id: this.state.lists[listId].id,
+          cardIds: this.state.lists[listId].cardIds.concat(newCard.id),
+        },
+      },
+    });
+  };
+
+  // this.setState({ cards: { …this.state.cards, [id]: newCards } }
 
   // TODO: implement the handleRemoveCard method to remove a card from a list.
   // Tips:
@@ -113,7 +143,11 @@ class Board extends Component {
   // TODO: implement the handleToggleMenu method to toggle the corresponding list menu.
   // Tips:
   // - Use the `this.setState` method to update the state (openMenuId)
-  handleToggleMenu(listId) {}
+  handleToggleMenu = (listId) => {
+    console.log(listId);
+
+    this.setState({ openMenuId: listId, isMenuOpen: true });
+  };
 
   // TODO: implement the handleEditCard method to update the card description.
   // Tips:
@@ -153,10 +187,31 @@ class Board extends Component {
   // - Add the children function that returns your board lists component and bind everything together
   // --> https://github.com/atlassian/react-beautiful-dnd/blob/master/docs/api/droppable.md#children-function
   renderLists() {
-    const renerLists = this.state.listOrder.map((list) => (
-      <CardsList cards={this.state.cards} />
-    ));
-    return <div className="board-lists">{renerLists}</div>;
+    const renderCardList = this.state.listOrder.map((listId, index) => {
+      const list = this.state.lists[listId];
+
+      const cards = this.state.lists[listId].cardIds.map((item) => {
+        return this.state.cards[item];
+      });
+
+      const isMenuOpen = listId === this.state.openMenuId ? true : false;
+
+      return (
+        <li key={listId}>
+          <CardsList
+            openMenuId={this.state.openMenuId}
+            isMenuOpen={isMenuOpen}
+            onToggleMenu={() => this.handleToggleMenu(listId)}
+            index={index}
+            id={list.id}
+            title={list.title}
+            cards={cards}
+            onAddCard={this.handleAddCard}
+          />
+        </li>
+      );
+    });
+    return <ul className="board-lists">{renderCardList}</ul>;
   }
 
   // TODO: implement the renderNewList method to render the list creation form.
@@ -172,6 +227,7 @@ class Board extends Component {
       />
     ) : (
       <Form
+        isMenuOpen={this.handleToggleMenu}
         placeholder="Edit a title for this list"
         type="list"
         onClickSubmit={this.handleAddList}

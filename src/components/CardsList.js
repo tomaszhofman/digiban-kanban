@@ -8,6 +8,7 @@ import Card from './Card';
 import CardEditor from './CardEditor';
 import Menu from './Menu';
 import Form from './Form';
+import Button from './Button';
 
 /*
  * TODO: Create the CardsList component
@@ -18,51 +19,51 @@ import Form from './Form';
  * - Should render a <div> element as the container for the card
  * - Should render the tags list at the top of the card content
  * - Should render the card number and description below the tags
- * 
+ *
  * Tips:
  * - You can use the 'card' CSS class for styling
- * 
- */ 
+ *
+ */
 class CardsList extends Component {
   constructor(props) {
     super(props);
 
     // CardsList state
-    this.state = { 
+    this.state = {
       creatingNewCard: false,
       editCardId: null,
       editCardText: '',
-      editCardTags: []
+      editCardTags: [],
     };
 
     // TODO: Define all the card actions here
     this.actions = [
       [
-        { 
+        {
           title: 'Add Card...',
-          onClick: () => null // TODO
+          onClick: () => null, // TODO
         },
-        { 
+        {
           title: 'Copy List...',
-          onClick: () => null // TODO
-        }
+          onClick: () => null, // TODO
+        },
       ],
       [
         {
           title: 'Move All Cards in This List...',
-          onClick: () => null // TODO
+          onClick: () => null, // TODO
         },
         {
           title: 'Archive All Cards in This List...',
-          onClick: () => null // TODO
+          onClick: () => null, // TODO
         },
       ],
       [
         {
           title: 'Archive This List',
-          onClick: () => null // TODO
-        }
-      ]
+          onClick: () => null, // TODO
+        },
+      ],
     ];
 
     // TODO: Bind your class methods here
@@ -73,9 +74,12 @@ class CardsList extends Component {
   // Tips:
   // - Call the `this.props.onAddCard` function to add a new card
   // - Use the `this.setState` method to update the state in order to close the card creation form
-  handleAddNewCard(cardText = '') {}
+  handleAddNewCard = (cardText = '') => {
+    this.props.onAddCard(this.props.id, cardText);
+    this.setState({ creatingNewCard: false });
+  };
 
-  // TODO: implement the handleCancelNewCard method.
+  // TODO: implement th e handleCancelNewCard method.
   // Tips:
   // - Use the `this.setState` method to update the state in order to close the card creation form
   handleCancelNewCard() {}
@@ -83,9 +87,9 @@ class CardsList extends Component {
   // TODO: implement the handleCreateNewCard method.
   // Tips:
   // - Use the `this.setState` method to update the state in order to open the card creation form
-  handleCreateNewCard() {
+  handleCreateNewCard = () => {
     this.setState({ creatingNewCard: true });
-  }
+  };
 
   // TODO: implement the handleEditCard method.
   // Tips:
@@ -135,13 +139,20 @@ class CardsList extends Component {
   // - Add a drag handle to the list header so that user can grab the list and drag it around
   // (using the dragHandleProps)
   renderHeader() {
+    const numberOfCards = this.props.cards.length;
+
     return (
       <div className="cards-list-header">
         <div className="cards-list-title">
-          { /* render the list title */ }
-          { /* render the Menu component */ }
+          <h3>{this.props.title} </h3>
+
+          <Menu
+            isMenuOpen={this.props.isMenuOpen}
+            onClick={this.props.onToggleMenu}
+            actions={this.actions}
+          />
         </div>
-        { /* render the number of cards in this list */ }
+        <p>{`${numberOfCards} cards`}</p>
       </div>
     );
   }
@@ -159,18 +170,30 @@ class CardsList extends Component {
   // - Add the children function that returns your cards and bind everything together
   // --> https://github.com/atlassian/react-beautiful-dnd/blob/master/docs/api/droppable.md#children-function
   renderCards() {
-    return (
-      <ol className="cards">
-        { /* render the cards */ }
-      </ol>
-    );
+    const renderCard = this.props.cards.map((card) => <Card {...card} />);
+    return <ol className="cards">{renderCard}</ol>;
   }
 
   // TODO: implement the renderFooter method to render the list footer UI.
   // Tips:
   // - Should render either a Form component to create a new card
   // or a button to trigger the card creation mode (creatingNewCard)
-  renderFooter() {}
+  renderFooter() {
+    return this.state.creatingNewCard ? (
+      <Form
+        type="editor"
+        placeholder="Enter a title for this card..."
+        // onAddCard={this.props.onAddCard}
+        handleAddNewCard={this.handleAddNewCard}
+      />
+    ) : (
+      <Button
+        onClick={this.handleCreateNewCard}
+        className="add-card-button add-button"
+        text="Add a new card"
+      />
+    );
+  }
 
   // TODO: render the CardsList UI.
   //
@@ -184,14 +207,17 @@ class CardsList extends Component {
   render() {
     return (
       <div className="cards-list">
-        { /* render list header */ }
-        { /* render cards */ }
-        { /* render list footer */ }
-        { /* render card editor */ }
+        {this.renderHeader()}
+        {this.renderCards()}
+        {this.renderFooter()}
+
+        {/* render list footer */}
+
+        {/* render card editor */}
       </div>
     );
   }
-};
+}
 
 CardsList.defaultProps = {
   cards: null,
@@ -206,7 +232,7 @@ CardsList.defaultProps = {
   onCopyCard: () => null,
   onEditCard: () => null,
   onRemoveTag: () => null,
-  onAddTag: () => null
+  onAddTag: () => null,
 };
 
 CardsList.propTypes = {
@@ -218,7 +244,7 @@ CardsList.propTypes = {
       id: PropTypes.string.isRequired,
       number: PropTypes.number.isRequired,
       description: PropTypes.string,
-      tags: PropTypes.arrayOf(PropTypes.string)
+      tags: PropTypes.arrayOf(PropTypes.string),
     })
   ),
   isMenuOpen: PropTypes.bool,
@@ -232,7 +258,7 @@ CardsList.propTypes = {
   onCopyCard: PropTypes.func,
   onEditCard: PropTypes.func,
   onRemoveTag: PropTypes.func,
-  onAddTag: PropTypes.func
+  onAddTag: PropTypes.func,
 };
 
 export default CardsList;
